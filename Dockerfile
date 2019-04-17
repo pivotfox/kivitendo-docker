@@ -16,10 +16,9 @@ RUN echo "$BUILD_TZ" > /etc/timezone && dpkg-reconfigure -f noninteractive tzdat
 
 #Packages basic preparation
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-RUN apt-get -qq update && apt-get -y upgrade
 
 #Packages
-RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update && \
+RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update && apt-get -y upgrade &&\
     apt-get -y install apache2 libarchive-zip-perl libclone-perl \
     libconfig-std-perl libdatetime-perl libdbd-pg-perl libdbi-perl \
     libemail-address-perl  libemail-mime-perl libfcgi-perl libjson-perl \
@@ -37,21 +36,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update && \
     texlive-generic-extra libdaemon-generic-perl libdatetime-event-cron-perl \
     libset-crontab-perl libdatetime-set-perl libfile-flock-perl libfile-slurp-perl \
     liblist-utilsby-perl libregexp-ipv6-perl libset-infinite-perl \
-    language-pack-de-base sudo
+    language-pack-de-base sudo && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
     
-#Install missing Perl Modules
-#RUN cpan HTML::Restrict
-#RUN cpan Image::Info
-#RUN cpan Algorithm::CheckDigits
-#RUN cpan PBKDF2::Tiny
-#RUN cpan CGI
-#RUN cpan File::MimeInfo
-#RUN cpan Text::Unidecode
-#RUN cpan Thread::Pool::Simple
-#RUN cpan LWP::Authen::Digest
-#RUN cpan LWP::UserAgent
-#RUN cpan Set::Crontab
-
 #Install Perl Modules
 RUN cpan Path::Tiny File:Basedir File::DesktopEntry DateTime::event::Cron DateTime::Set \
          FCGI HTML::Restrict Image::Info PBKDF2::Tiny Text::Unidecode \
@@ -62,7 +49,7 @@ RUN cpan Path::Tiny File:Basedir File::DesktopEntry DateTime::event::Cron DateTi
 # ADD KIVITENDO
 RUN git clone https://github.com/kivitendo/kivitendo-erp.git /var/www/kivitendo-erp
 RUN cd /var/www/kivitendo-erp && git checkout release-3.5.3
-ADD kivitendo.conf /var/www/kivitendo-erp/config/kivitendo.conf
+ADD /conf/kivitendo.conf /var/www/kivitendo-erp/config/kivitendo.conf
 
 #Check Kivitendo installation
 RUN cd /var/www/kivitendo-erp/ && perl /var/www/kivitendo-erp/scripts/installation_check.pl
@@ -107,13 +94,13 @@ RUN a2enmod fcgid.load
 EXPOSE 80
  
 # Update the default apache site with the config 
-COPY apache-config.conf /etc/apache2/apache2.conf
+COPY /conf/apache-config.conf /etc/apache2/apache2.conf
+
 
 # Add VOLUMEs to allow backup of config, logs and databases
 VOLUME  ["/var/log/apache2", "/var/www/kivitendo-erp/users", "/var/www/kivitendo-erp/webdav", "/var/www/kivitendo-erp/templates", "/var/www/kivitendo-erp/config", "/home"]
 
-# Clean up APT when done.
-RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-# simply start the webserver
-CMD ["/usr/sbin/apache2ctl", "-DFOREGROUND"]
+# update kivi config and start apache
+COPY /scripts/startKivi.sh /tmp/startKivi.sh
+RUN chmod +x /tmp/startKivi.sh
+ENTRYPOINT ["/tmp/startKivi.sh"]
