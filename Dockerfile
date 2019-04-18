@@ -2,7 +2,7 @@ FROM ubuntu:14.04
 
 # Inspired by drnoa/kivitendo_docker 
 
-MAINTAINER Marc Schickedanz <marc.schickedanz@pivotfox.de> version: 0.0.1
+MAINTAINER Marc Schickedanz <marc.schickedanz@pivotfox.de> version: 0.0.2
 
 #15.04.2019 Kivitendo 3.5.3
 
@@ -59,6 +59,9 @@ USER root
 
 RUN mkdir -p /var/lock/apache2 /var/run/apache2 /var/run/sshd
 
+# Update the default apache site with the config 
+COPY /conf/apache-config.conf /etc/apache2/apache2.conf
+
 # SET Servername to localhost
 RUN echo "ServerName localhost" >> /etc/apache2/conf-available/servername.conf
 RUN a2enconf servername
@@ -93,8 +96,6 @@ RUN a2enmod fcgid.load
 #set Port
 EXPOSE 80
  
-# Update the default apache site with the config 
-COPY /conf/apache-config.conf /etc/apache2/apache2.conf
 
 
 # Add VOLUMEs to allow backup of config, logs and databases
