@@ -2,18 +2,16 @@ kivitendo_docker
 ================
 
 Docker Build for Kivitendo 3.5.3 
- - Ubuntu:14.04
+ - Ubuntu: 18.04
  - Kivitendo 3.5.3
  
 
-# Start the app
+# Start the app local
 
-Browser: http://"ipadress":"port"/kivitendo-erp/
-
+Start the app with provided docker-compose up
+Browser: http://localhost/kivitendo-erp/
 
 
 # ToDo´s
-- Import templates & webdav Files
-- chown -R www-data templates webdav
-- Configuration of Taskserver for autostartup  (see manual)
-- Adaptation kivitendo-config (/var/www/kivitendo-erp/config/...)
+- Import templates
+- Configuration of Taskserver for autostartup  (currently manuel start in the system tab needed)
