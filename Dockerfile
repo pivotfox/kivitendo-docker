@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 FROM ubuntu:18.04
 
 MAINTAINER Marc Schickedanz <marc.schickedanz@pivotfox.de> version: 0.0.4
@@ -23,6 +24,30 @@ RUN echo $TZ > /etc/timezone && \
 RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update && apt-get -y upgrade &&\
     apt-get -y install \
     apache2 libarchive-zip-perl libclone-perl \
+=======
+FROM ubuntu:14.04
+
+# Inspired by drnoa/kivitendo_docker 
+
+MAINTAINER Marc Schickedanz <marc.schickedanz@pivotfox.de> version: 0.0.2
+
+#15.04.2019 Kivitendo 3.5.3
+
+# parameter 
+ARG BUILD_KIVITENDO_VERSION="release-3.5.3"
+ARG BUILD_TZ="Europe/Berlin"
+ENV locale de_DE
+
+# set timezone
+RUN echo "$BUILD_TZ" > /etc/timezone && dpkg-reconfigure -f noninteractive tzdata
+
+#Packages basic preparation
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+#Packages
+RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update && apt-get -y upgrade &&\
+    apt-get -y install apache2 libarchive-zip-perl libclone-perl \
+>>>>>>> 74bf1f28849f1d8c61bdf3d5fbfa52f0cffa9a33
     libconfig-std-perl libdatetime-perl libdbd-pg-perl libdbi-perl \
     libemail-address-perl  libemail-mime-perl libfcgi-perl libjson-perl \
     liblist-moreutils-perl libnet-smtp-ssl-perl libnet-sslglue-perl \
@@ -39,6 +64,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update && apt-get -y upgrade &&\
     texlive-generic-extra libdaemon-generic-perl libdatetime-event-cron-perl \
     libset-crontab-perl libdatetime-set-perl libfile-flock-perl libfile-slurp-perl \
     liblist-utilsby-perl libregexp-ipv6-perl libset-infinite-perl \
+<<<<<<< HEAD
     language-pack-de-base libwww-perl libhtml-restrict-perl libpbkdf2-tiny-perl \
     sudo systemd && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -48,22 +74,40 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update && apt-get -y upgrade &&\
 # apt install supervisor
 # ADD supervisor to run kivi & taskserver
 #ADD /conf/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+=======
+    language-pack-de-base sudo && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    
+#Install Perl Modules
+RUN cpan Path::Tiny File:Basedir File::DesktopEntry DateTime::event::Cron DateTime::Set \
+         FCGI HTML::Restrict Image::Info PBKDF2::Tiny Text::Unidecode \
+         Set::Infinite Rose::Db::Object HTML::Restrict Image::Info \
+         Algorithm::CheckDigits PBKDF2::Tiny CGI File::MimeInfo Text::Unidecode \
+         Thread::Pool::Simple LWP::Authen::Digest LWP::UserAgent cpan Set::Crontab
+>>>>>>> 74bf1f28849f1d8c61bdf3d5fbfa52f0cffa9a33
 
 # ADD KIVITENDO
 RUN git clone https://github.com/kivitendo/kivitendo-erp.git /var/www/kivitendo-erp
 RUN cd /var/www/kivitendo-erp && git checkout release-3.5.3
 ADD /conf/kivitendo.conf /var/www/kivitendo-erp/config/kivitendo.conf
 
+<<<<<<< HEAD
 # ADD Kivitendo Task Server Script 
 ADD /conf/kivitendo-task-server.service /etc/systemd/system/kivitendo-task-server.service
 
+=======
+>>>>>>> 74bf1f28849f1d8c61bdf3d5fbfa52f0cffa9a33
 #Check Kivitendo installation
 RUN cd /var/www/kivitendo-erp/ && perl /var/www/kivitendo-erp/scripts/installation_check.pl
 
 # Setup APACHE as ``root`` user
 USER root
 
+<<<<<<< HEAD
 RUN mkdir -p /var/lock/apache2 /var/run/apache2 /var/run/sshd /var/log/supervisor
+=======
+RUN mkdir -p /var/lock/apache2 /var/run/apache2 /var/run/sshd
+>>>>>>> 74bf1f28849f1d8c61bdf3d5fbfa52f0cffa9a33
 
 # Update the default apache site with the config 
 COPY /conf/apache-config.conf /etc/apache2/apache2.conf
