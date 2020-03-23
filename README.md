@@ -1,9 +1,9 @@
 kivitendo_docker
 ================
 
-Docker Build for Kivitendo 3.5.3 
+Docker Build for Kivitendo 3.5.4 
  - Ubuntu: 18.04
- - Kivitendo 3.5.3
+ - Kivitendo 3.5.4
  
 
 # Start the app locally
