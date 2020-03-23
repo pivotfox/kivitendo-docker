@@ -1,0 +1,41 @@
+version: '3.5'
+
+services:
+  postgres:
+    container_name: postgres_container
+    image: postgres:11.6
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATA: /data/postgres
+    volumes:
+       - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - kivinet
+    restart: unless-stopped
+  
+  mykivi:
+    container_name: pfoxkivi_container_2
+    image: pivotfox/pfoxkivi2020:0.1
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+    volumes:
+       - mykivi:/data/kivi
+    ports:
+      - "80:80"
+    networks:
+      - kivinet
+    restart: unless-stopped
+
+networks:
+  kivinet:
+    driver: bridge
+
+volumes:
+    postgres:
+    mykivi:
