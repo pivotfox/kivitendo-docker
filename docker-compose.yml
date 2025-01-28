@@ -1,33 +1,41 @@
-version: '3.5'
-
 services:
   postgres:
     container_name: postgres_container
-    image: postgres:11.6
+    image: postgres:16.6
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: changeme
       PGDATA: /data/postgres
     volumes:
-       - postgres:/data/postgres
+      - postgres:/data/postgres
     ports:
       - "5432:5432"
     networks:
       - kivinet
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   
   mykivi:
     container_name: pfoxkivi_container_2
-    image: pivotfox/pfoxkivi2020:0.1
+    build: .
+    image: my-kivitendo.crm:latest
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
-      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: changeme
+      ADMIN_PASSWORD: admin_test
+      POSTGRES_HOST: postgres
+      #POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+    depends_on:
+      postgres:
+        condition: service_healthy
     volumes:
-       - mykivi:/data/kivi
+      - mykivi:/data/kivi
     ports:
-      - "80:80"
+      - "80:8080"
     networks:
       - kivinet
     restart: unless-stopped
@@ -37,5 +45,5 @@ networks:
     driver: bridge
 
 volumes:
-    postgres:
-    mykivi:
+  postgres:
+  mykivi:

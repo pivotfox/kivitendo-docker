@@ -1,22 +1,18 @@
 #!/bin/bash
 
-sed -i "/admin_password = admin123/c\admin_password = $ADMIN_PASSWORD" /var/www/kivitendo-erp/config/kivitendo.conf
-sed -i "/user     = postgres/c\user     = $POSTGRES_USER" /var/www/kivitendo-erp/config/kivitendo.conf
-sed -i "/password = test/c\password = $POSTGRES_PASSWORD" /var/www/kivitendo-erp/config/kivitendo.conf
-sed -i "/host     = localhost/c\host     = $POSTGRES_HOST" /var/www/kivitendo-erp/config/kivitendo.conf
+# Copy configuration files
+cp -a /var/www/kivitendo-erp/.config/kivitendo.conf /var/www/kivitendo-erp/config/kivitendo.conf
+#envsubst < /var/www/kivitendo-erp/.config/kivitendo.conf.in > /var/www/kivitendo-erp/config/kivitendo.conf
 
-#sed -i "/TEXT_TO_BE_REPLACED/c $REPLACEMENT_TEXT_STRING" /tmp/foo
-#sed -i '/TEXT_TO_BE_REPLACED/c\This line is removed by the admin.' /tmp/foo
-# service kivitendo-task-server start
+# Copy user files if .users directory exists
+if [ -d "/var/www/kivitendo-erp/.users" ]; then
+    cp -a /var/www/kivitendo-erp/.users/* /var/www/kivitendo-erp/users/
+    cp -a /var/www/kivitendo-erp/.users/.??* /var/www/kivitendo-erp/users/
+fi
 
-#systemctl daemon-reload
-# systemctl enable kivitendo-task-server.service
-# systemctl start kivitendo-task-server.service
+# Create required directories
+mkdir -p /tmp/socks
+[ -d "${APACHE_RUN_DIR}" ] || mkdir -p ${APACHE_RUN_DIR}
 
-# host     = postgres_container
-# port     = 5432
-# db       = kivitendo_auth
-# user     = postgres
-# password = changeme
-
+# Wait for PostgreSQL to be ready
 exec apache2 -DFOREGROUND
